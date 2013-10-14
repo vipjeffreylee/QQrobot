@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/qqlogo.png</file>
+        <file>img/captcha.jpg</file>
+        <file>img/logo.ico</file>
+    </qresource>
+</RCC>

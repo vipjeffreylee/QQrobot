@@ -1,0 +1,10 @@
+/****************************************************************************
+**
+** %FILENAME%
+** Copyright (C) 2013 Jeffrey Lee.
+** All rights reserved.
+** Contact: vipjeffreylee@gmail.com
+** Please keep the author contact information. 
+** %YEAR%-%MONTH%-%DAY%
+**
+****************************************************************************/
