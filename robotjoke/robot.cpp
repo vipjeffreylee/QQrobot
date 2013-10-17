@@ -11,6 +11,9 @@
 #include<QTime>
 #include<QDebug>
 #include<QDateTime>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 Robot::Robot(){
     joke<<"离婚以后，李亚鹏黯然神伤。 中秋朋友聚会，签单时把名字写成了“李亚朋”，旁边朋友悄声提醒：“你的鸟没了。” 李亚鹏苦笑道：“老婆都没了，还要鸟有什么用。” 王菲听说这件事后，默默将名字改成了“王非”。"
        <<"校长有天路过学校后门，突然听到一句：“我要考牛津！”校长顿时感动不己，没想到我们学校也有如此有志青年，决定看看是哪位，忽然又听到一句：“再来两串大腰子！！！"
@@ -26,12 +29,24 @@ Robot::Robot(){
     time= QTime::currentTime();
     qsrand(time.msec()+time.second()*1000);
     qDebug()<<"rebot start"<<endl;
+    QSqlDatabase db=QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("robotjoke.db3");
+    if(db.open()){
+        qDebug()<<"数据库打开成功！"<<endl;
+        db.close();
+    }else{
+        qDebug()<<"数据库打开失败！"<<endl;
+    }
+
 }
 Robot::~Robot(){
     qDebug()<<"rebot close"<<endl;
+    //db->close();
+    //delete db;
 }
 
 QString Robot::name(){
+
     return QString("我爱讲笑话");
 }
 ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){

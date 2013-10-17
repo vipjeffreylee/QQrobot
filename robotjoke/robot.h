@@ -13,7 +13,6 @@
 #include <QtPlugin>
 #include<QStringList>
 #include "robotinterface.h"
-
 class  Robot : public QObject, RobotInterface
 {
         Q_OBJECT
@@ -26,6 +25,7 @@ public:
     ReplyMsg listenandsay(const MsgSender msgSender, const QString &message);
 private:
     QStringList joke;
+    QStringList jokelist;
 };
 
 #endif // ROBOT_H
