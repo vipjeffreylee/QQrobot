@@ -24,8 +24,11 @@ public:
     QString name();
     ReplyMsg listenandsay(const MsgSender msgSender, const QString &message);
 private:
-    QStringList joke;
+   // QStringList joke;
     QStringList jokelist;
+    bool loaddb();
+    void closedb();
+    bool savejoke(QString joke,QString creator);
 };
 
 #endif // ROBOT_H
