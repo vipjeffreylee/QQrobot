@@ -4,18 +4,26 @@
 #
 #-------------------------------------------------
 
+QT       +=sql network
 QT       -= gui
-
+CONFIG   +=C++11
 TEMPLATE = lib
 
 DEFINES += ROBOT_LIBRARY
 
 INCLUDEPATH    += ../QQ
-SOURCES += robot.cpp
+SOURCES += robot.cpp \
+    chinaweather.cpp \
+    baiduweather.cpp
 
-HEADERS += robot.h
+HEADERS += robot.h \
+    chinaweather.h \
+    baiduweather.h
+
 TARGET          = $$qtLibraryTarget(robotwiki)
 DESTDIR         = ../plugins
 
 EXAMPLE_FILES = robotwikiplugin.json
+
+OTHER_FILES += \
 

@@ -11,9 +11,10 @@
 #define ROBOT_H
 #include <QObject>
 #include <QtPlugin>
-#include<QStringList>
+#include <QStringList>
 #include "robotinterface.h"
-
+class QNetworkAccessManager;
+class QNetworkReply;
 class  Robot : public QObject, RobotInterface
 {
         Q_OBJECT
@@ -23,8 +24,15 @@ public:
     Robot();
     QString name();
     ReplyMsg listenandsay(const MsgSender msgSender, const QString &message);
+private slots:
+    void replyFinished(QNetworkReply * reply);
+signals:
+    void OnEventLoopQuit();
 private:
-    QStringList joke;
+    QNetworkAccessManager *http;
+    QString getWeather();
+    QString weather;
+
 };
 
 #endif // ROBOT_H
