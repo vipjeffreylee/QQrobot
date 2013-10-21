@@ -31,16 +31,29 @@ ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){
     }else{
         replyMsg.recTXUIN=msgSender.groupTXUIN;
     }
+    QString tmpstr;
     if(message.indexOf("#help")==0){
-        replyMsg.content="我是生活小百科，我能告诉你：\n #几点了、#time\n#天气 城市名\n#translate 空格间隔翻译内容";
+        replyMsg.content="我是生活小百科，我能告诉你：\n#几点了、#time\n#天气 城市名\n#translate 空格间隔翻译内容";
     }else if(message.indexOf("#几点了")==0||message.indexOf("#time")==0){
         replyMsg.content=QString("%1 现在时间是：\n%2")
                 .arg(msgSender.friendName)
                 .arg(QDateTime::currentDateTime().toString("yyyy年MM月dd日 hh点mm分ss秒"));
     }else if(message.indexOf("#天气")==0){
-        replyMsg.content=BaiduWeather::getWeather(message.mid(3));
+        tmpstr=message.mid(3).trimmed();
+        if(tmpstr.isEmpty()){
+            replyMsg.content="请告诉我，你要哪里的天气预报？";
+        }else{
+            replyMsg.content=BaiduWeather::getWeather(tmpstr);
+        }
+
     }else if(message.indexOf("#translate")==0||message.indexOf("#fy")==0||message.indexOf("#翻译")==0){
-        replyMsg.content=Baidutranslate::translate(message.mid(message.indexOf(' ')));
+        tmpstr=message.mid(message.indexOf(' '));
+        if(tmpstr.isEmpty()){
+            replyMsg.content="请告诉我，你要我帮你翻译什么？";
+        }else{
+            replyMsg.content=Baidutranslate::translate(tmpstr);
+        }
+
     }
     return replyMsg;
 }
