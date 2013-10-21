@@ -14,11 +14,13 @@ DEFINES += ROBOT_LIBRARY
 INCLUDEPATH    += ../QQ
 SOURCES += robot.cpp \
     chinaweather.cpp \
-    baiduweather.cpp
+    baiduweather.cpp \
+    baidutranslate.cpp
 
 HEADERS += robot.h \
     chinaweather.h \
-    baiduweather.h
+    baiduweather.h \
+    baidutranslate.h
 
 TARGET          = $$qtLibraryTarget(robotwiki)
 DESTDIR         = ../plugins

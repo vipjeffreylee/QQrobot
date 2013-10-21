@@ -562,12 +562,14 @@ void WebQQNet::sendMsg(QString txuin, QString msg){
         currSendMsg.first=txuin;
         currSendMsg.second=msg;
         //对json 特殊字符进行替换
+        qDebug()<<"对json 特殊字符进行替换__前"<<msg<<endl;
         msg.replace("\\", "\\\\")
-                .replace("\'", "\\\'")
+                //.replace("\'", "")
                 .replace("\t", " ")
                 .replace("\r", " ")
                 .replace("\n", "\\\\n")
                 .replace("\"", "'");
+        qDebug()<<"对json 特殊字符进行替换__后"<<msg<<endl;
         if(txuinflag=="FTX"){
             WebQQ::webQQNet->sendBuddyMsg(txuin.mid(3),msg);
         }else if(txuinflag=="GTX"){
