@@ -47,7 +47,7 @@ ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){
         }
 
     }else if(message.indexOf("#translate")==0||message.indexOf("#fy")==0||message.indexOf("#翻译")==0){
-        tmpstr=message.mid(message.indexOf(' '));
+        tmpstr=message.mid(message.indexOf(' ')).trimmed();
         if(tmpstr.isEmpty()){
             replyMsg.content="请告诉我，你要我帮你翻译什么？";
         }else{

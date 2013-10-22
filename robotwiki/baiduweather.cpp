@@ -16,7 +16,7 @@ void BaiduWeather::setLocation(const QString &location)
 {
     data = "对不起，我获取信息失败了、、、";
 //    location=location.trimmed();
-//    cityname=location;
+    cityname=location;
     QString strSent = "http://api.map.baidu.com/telematics/v3/weather?location=" + location +" &output=json&ak=6632266da0d7c5839bf5dcc440d15c87";
     request.setUrl(strSent);
     this->reply = this->manger.get(this->request);

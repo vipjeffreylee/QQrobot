@@ -64,14 +64,14 @@ void WebQQNet::pollMsg(){
 void WebQQNet::httpPollFinished(QNetworkReply* reply){
 
     QByteArray replyData=reply->readAll();
-     reply->deleteLater();
-     QString replystr=QString::fromUtf8(replyData);
+    reply->deleteLater();
+    QString replystr=QString::fromUtf8(replyData);
     QJsonDocument jsonDoc;
     QJsonObject jsonObj;
     QJsonArray jsonArray;
     int retcode=0;
     jsonDoc=QJsonDocument::fromJson(replyData);
-    qDebug()<<"httpPollFinished jsonDoc="<<jsonDoc<<endl<<"replystr="<<replystr<<endl;
+    qDebug()<<"httpPollFinished jsonDoc="<<jsonDoc<<endl<<"replystr="<<replystr<<replystr.length()<<endl;
     if(jsonDoc.isObject()){
         jsonObj=jsonDoc.object();
         retcode=jsonObj.value("retcode").toDouble();
@@ -154,8 +154,12 @@ void WebQQNet::getGroupMemberInfo(QString groupTXUIN){
 void WebQQNet::httpExtInfoFinished(QNetworkReply* reply){
     qDebug()<<"httpPollFinished"<<endl;
     QByteArray replyData=reply->readAll();
-     reply->deleteLater();
-     QString replystr=QString::fromUtf8(replyData);
+
+   // replyData.replace("\xe2\x80\xae","");//字符串中包含这几个字符，会莫名其妙的反转显示，非常奇特！
+   //  replyData.replace("\xe2\x80\xa8","");//导致回车换行
+//由于有些群成员名片是非法utf-8字符，导致json数据解析错误只好自己使用replystr.toUtf8()再转一次
+    reply->deleteLater();
+    QString replystr=QString::fromUtf8(replyData);
     QQgroup*pGroup=WebQQ::qqGroups.value(currGroupTXUIN,nullptr);
     if(pGroup==nullptr){
         qDebug()<<"httpExtInfoFinished 查无此群！"<<endl;
@@ -165,8 +169,9 @@ void WebQQNet::httpExtInfoFinished(QNetworkReply* reply){
     QJsonObject jsonObj;
     QJsonArray jsonArray;
     int retcode=0;
-    jsonDoc=QJsonDocument::fromJson(replyData);
-   // qDebug()<<"httpPollFinished"<<jsonDoc<<endl;
+    QJsonParseError jsonError;
+    jsonDoc=QJsonDocument::fromJson(replystr.toUtf8(),&jsonError);
+    // qDebug()<<"httpPollFinished"<<jsonDoc<<endl;
     if(jsonDoc.isObject()){
         jsonObj=jsonDoc.object();
         retcode=jsonObj.value("retcode").toDouble();
@@ -193,19 +198,21 @@ void WebQQNet::httpExtInfoFinished(QNetworkReply* reply){
         }else{//有时候返回 {"retcode":100000}，得不到成员信息
             pGroup->members.insert("0",new QQfriend);
         }
+    }else{
+        qDebug()<<"httpExtInfoFinished failure"<<replystr<<jsonError.errorString()<<endl<<replyData.data()<<endl;
     }
-   emit sysMsg(QString("获取%1群成员信息完成，成员数量：%2").arg(WebQQ::qqGroups.value(currGroupTXUIN)->name)
+    emit sysMsg(QString("获取%1群成员信息完成，成员数量：%2").arg(WebQQ::qqGroups.value(currGroupTXUIN)->name)
                 .arg(WebQQ::qqGroups.value(currGroupTXUIN)->members.size()));
     emit msgReceived();
     currGroupTXUIN.clear();
-    qDebug()<<"httpExtInfoFinished"<<endl;
+    qDebug()<<"httpExtInfoFinished /////////////////////////////////////////////////////////////////////////////"<<endl;
     //this->pollMsg();
 }
 
 void WebQQNet::httpFinished(QNetworkReply* reply){
     QByteArray replyData=reply->readAll();
-     reply->deleteLater();
-     QString replystr=QString::fromUtf8(replyData);
+    reply->deleteLater();
+    QString replystr=QString::fromUtf8(replyData);
     QJsonDocument jsonDoc;
     QJsonObject jsonObj;
     QJsonArray jsonArray;
