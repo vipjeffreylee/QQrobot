@@ -299,7 +299,7 @@ void MainWindow::msgReceived(){
             }
         }
         foreach(int id ,robotIds){
-            ReplyMsg rmsg=robots.at(id)->listenandsay(msgSender,pMsg->content);
+            ReplyMsg rmsg=robots.at(id)->listenandsay(msgSender,pMsg->content.trimmed());
             if(rmsg.content.isEmpty()){
                 continue;
             }else{

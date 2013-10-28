@@ -134,7 +134,7 @@ ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){
         if(jokelist.isEmpty()){
             replyMsg.content="对不起，我现在没收集到任何笑话，请用#addjoke命令添加笑话。";
         }else{
-             replyMsg.content=jokelist.at(qrand()%(jokelist.length()));
+            replyMsg.content=jokelist.at(qrand()%(jokelist.length()));
         }
     }else if(message.left(8)=="#addjoke"){
         jokelist<<message.mid(8);
@@ -145,21 +145,32 @@ ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){
     }else if(message.left(2)=="#问"){
         int pos=message.indexOf("#答");
         if(pos>0){
-            QString question=message.mid(2,pos-2);
+            QString question=message.mid(2,pos-2).trimmed();
             QString answer=message.mid(pos+2);
             savechat(question,answer,msgSender.friendName);
             replyMsg.content=QString("谢谢，我明白了，问我:%1,我回答:%2,现有知识库%3条。").arg(question).arg(answer).arg(chat.size());
         }else{
             replyMsg.content="有问没答。";
         }
+    }else if(message.left(2)=="#查"){
+        QString question=message.mid(2).trimmed();
+        QStringList answerList=chat.value(question);
+        if(answerList.size()>0){
+            QString id=answerList.takeFirst();
+            replyMsg.content=QString("id=%1 问:%2 答:%3").arg(id).arg(question).arg(answerList.join(';'));
+        }else{
+            replyMsg.content=QString("没有查询到：%1").arg(question);
+        }
+
+    }else if(message.left(2)=="#删"){
+
     }else{
         QStringList answerList=chat.value(message);
-        if(answerList.size()>0){
+        if(answerList.size()>1){
             answerList.removeFirst();
-            replyMsg.content=answerList.at(qrand()%(answerList.size()));
-        }else{
-            replyMsg.content=message;
-            qDebug()<<answerList.size()<<answerList;
+            QString answerstr=answerList.at(qrand()%(answerList.size()));
+            int pos=answerstr.indexOf("#C#");
+            replyMsg.content=answerstr.left(pos);
         }
     }
     return replyMsg;

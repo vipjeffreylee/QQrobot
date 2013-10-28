@@ -57,7 +57,7 @@ void WebQQNet::pollMsg(){
     postData.append(QString("&clientid=%1&psessionid=%2").arg(clientid).arg(psessionid));
     request.setHeader(QNetworkRequest::ContentLengthHeader,postData.size());
     //httpAction=HttpAction::GetMsgAction;
-    qDebug()<<"PollMsg"<<QDateTime::currentMSecsSinceEpoch()<<endl;
+    //qDebug()<<"PollMsg"<<QDateTime::currentMSecsSinceEpoch()<<endl;
     httpPoll->post(request,postData);
 }
 
@@ -71,7 +71,7 @@ void WebQQNet::httpPollFinished(QNetworkReply* reply){
     QJsonArray jsonArray;
     int retcode=0;
     jsonDoc=QJsonDocument::fromJson(replyData);
-    qDebug()<<"httpPollFinished jsonDoc="<<jsonDoc<<endl<<"replystr="<<replystr<<replystr.length()<<endl;
+    //qDebug()<<"httpPollFinished jsonDoc="<<jsonDoc<<endl<<"replystr="<<replystr<<replystr.length()<<endl;
     if(jsonDoc.isObject()){
         jsonObj=jsonDoc.object();
         retcode=jsonObj.value("retcode").toDouble();
@@ -107,14 +107,14 @@ void WebQQNet::httpPollFinished(QNetworkReply* reply){
                     }
                 }
                 WebQQ::qqmsgs.append(msg);
-                qDebug()<<msg->type<<msg->from_uin<<msg->time<<QDateTime::fromTime_t(msg->time)<<endl<<msg->content<<endl;
+                //qDebug()<<msg->type<<msg->from_uin<<msg->time<<QDateTime::fromTime_t(msg->time)<<endl<<msg->content<<endl;
             }
             WebQQ::mutex.unlock();
             emit msgReceived();
 
         }else if(retcode==116){
             ptwebqq=jsonObj.value("p").toString();
-            qDebug()<<"httpPollFinished retcode="<<retcode<<endl;
+            //qDebug()<<"httpPollFinished retcode="<<retcode<<endl;
         }
     }
     if(retcode==0||retcode==102||retcode==116){
@@ -147,12 +147,12 @@ void WebQQNet::getGroupMemberInfo(QString groupTXUIN){
     request.setRawHeader("Referer","http://s.web2.qq.com/proxy.html?v=20110412001&callback=1&id=3");
     request.setRawHeader("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36");
 
-    qDebug()<<"getGroupMemberInfo"<<urlstr<<endl;
+    //qDebug()<<"getGroupMemberInfo"<<urlstr<<endl;
     httpExtInfo->get(request);
 }
 
 void WebQQNet::httpExtInfoFinished(QNetworkReply* reply){
-    qDebug()<<"httpPollFinished"<<endl;
+    //qDebug()<<"httpPollFinished"<<endl;
     QByteArray replyData=reply->readAll();
 
    // replyData.replace("\xe2\x80\xae","");//字符串中包含这几个字符，会莫名其妙的反转显示，非常奇特！
@@ -162,7 +162,7 @@ void WebQQNet::httpExtInfoFinished(QNetworkReply* reply){
     QString replystr=QString::fromUtf8(replyData);
     QQgroup*pGroup=WebQQ::qqGroups.value(currGroupTXUIN,nullptr);
     if(pGroup==nullptr){
-        qDebug()<<"httpExtInfoFinished 查无此群！"<<endl;
+        //qDebug()<<"httpExtInfoFinished 查无此群！"<<endl;
         return;
     }
     QJsonDocument jsonDoc;
@@ -199,13 +199,13 @@ void WebQQNet::httpExtInfoFinished(QNetworkReply* reply){
             pGroup->members.insert("0",new QQfriend);
         }
     }else{
-        qDebug()<<"httpExtInfoFinished failure"<<replystr<<jsonError.errorString()<<endl<<replyData.data()<<endl;
+        //qDebug()<<"httpExtInfoFinished failure"<<replystr<<jsonError.errorString()<<endl<<replyData.data()<<endl;
     }
     emit sysMsg(QString("获取%1群成员信息完成，成员数量：%2").arg(WebQQ::qqGroups.value(currGroupTXUIN)->name)
                 .arg(WebQQ::qqGroups.value(currGroupTXUIN)->members.size()));
     emit msgReceived();
     currGroupTXUIN.clear();
-    qDebug()<<"httpExtInfoFinished /////////////////////////////////////////////////////////////////////////////"<<endl;
+    //qDebug()<<"httpExtInfoFinished /////////////////////////////////////////////////////////////////////////////"<<endl;
     //this->pollMsg();
 }
 
@@ -229,18 +229,18 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
         }
         replystr.chop(3);
         uinhexstr=replystr.right(32).remove("\\x");
-        qDebug()<<replystr<<uinhexstr<<endl;
+        //qDebug()<<replystr<<uinhexstr<<endl;
         break;
     case HttpAction::GetVerifyImgAction:
-        qDebug()<<reply->header(QNetworkRequest::ContentTypeHeader).toString();
+        //qDebug()<<reply->header(QNetworkRequest::ContentTypeHeader).toString();
         emit getVerifyImgFinished(replyData);
         httpAction=HttpAction::NoAction;
         break;
     case HttpAction::LoginAction:
-        qDebug()<<replystr<<endl;
+        //qDebug()<<replystr<<endl;
         if(replystr.indexOf("ptuiCB('0'")>-1){
             ptwebqq=getCookie("ptwebqq");
-            qDebug()<<"get cookie ptwebqq="<<ptwebqq<<endl;
+            //qDebug()<<"get cookie ptwebqq="<<ptwebqq<<endl;
         }
         if(!ptwebqq.isEmpty()){
             check_sig(replystr);
@@ -252,7 +252,7 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
         login2();
         break;
     case HttpAction::Login2Action:
-        qDebug()<<"Login2Action"<<replystr<<endl;
+        //qDebug()<<"Login2Action"<<replystr<<endl;
         jsonDoc=QJsonDocument::fromJson(replyData);
         if(jsonDoc.isNull()){
             emit loginFinished(false,"登录失败！");
@@ -261,7 +261,7 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
             if(jsonObj.value("retcode").toDouble()==0){
                 jsonObj=jsonObj.value("result").toObject();
                 uin=jsonObj.value("uin").toDouble();
-                qDebug()<<"uin="<<uin<<endl<<jsonObj;
+                //qDebug()<<"uin="<<uin<<endl<<jsonObj;
                 vfwebqq=jsonObj.value("vfwebqq").toString();
                 psessionid=jsonObj.value("psessionid").toString();
                 //qDebug()<<"登录成功！vfwebqq="<<vfwebqq<<"psessionid="<<psessionid<<endl;
@@ -273,11 +273,11 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
         //qDebug()<<replystr<<endl<<http->cookieJar()->cookiesForUrl(QUrl("http://www.qq.com/"));
         break;
     case HttpAction::GetFriendInfoAction:
-        qDebug()<<replystr<<endl;
+        //qDebug()<<replystr<<endl;
         break;
     case HttpAction::GetUserFriendsAction:
         jsonDoc=QJsonDocument::fromJson(replyData);
-        qDebug()<<"GetUserFriendsAction finished"<<endl;
+        //qDebug()<<"GetUserFriendsAction finished"<<endl;
 
         if(jsonDoc.isObject()){
             jsonObj=jsonDoc.object();
@@ -314,12 +314,12 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
 
 
         this->getGroupNameList();
-        qDebug()<<WebQQ::qqFriends.size()<<WebQQ::qqFriends<<endl;
+        //qDebug()<<WebQQ::qqFriends.size()<<WebQQ::qqFriends<<endl;
         break;
     case HttpAction::GetGroupNameListAction:
-        qDebug()<<"GetGroupNameListAction finished"<<endl;
+        //qDebug()<<"GetGroupNameListAction finished"<<endl;
         jsonDoc=QJsonDocument::fromJson(replyData);
-        qDebug()<<"GetGroupNameListAction"<<jsonDoc<<endl;
+        //qDebug()<<"GetGroupNameListAction"<<jsonDoc<<endl;
         if(jsonDoc.isObject()){
             jsonObj=jsonDoc.object();
             if(jsonObj.value("retcode").toDouble()==0){
@@ -332,7 +332,7 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
                     g->txuin=QString::number(jsonObj.value("gid").toDouble(),'f',0);
                     g->code=QString::number(jsonObj.value("code").toDouble(),'f',0);
                     WebQQ::qqGroups.insert(g->txuin,g);
-                    qDebug()<<g->txuin<<g->name<<endl;
+                    //qDebug()<<g->txuin<<g->name<<endl;
                     QStandardItem *item=new QStandardItem();
                     item->setText(g->name);
                     item->setData("GTX"+g->txuin,Qt::UserRole);
@@ -359,7 +359,7 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
             }
         }
         emit sendMsgFinished(currSendMsg.first,currSendMsg.second,isok);
-        qDebug()<<"SendBuddyMsgAction"<<currSendMsg<<isok<<replystr<<endl;
+        //qDebug()<<"SendBuddyMsgAction"<<currSendMsg<<isok<<replystr<<endl;
         httpAction=HttpAction::NoAction;
         break;
     case HttpAction::SendGroupMsgAction:
@@ -373,7 +373,7 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
         }
         //qDebug()<<"SendGroupMsgAction"<<currSendMsg<<isok<<endl;
         emit sendMsgFinished(currSendMsg.first,currSendMsg.second,isok);
-        qDebug()<<"SendGroupMsgAction"<<currSendMsg<<isok<<replystr<<endl;
+        //qDebug()<<"SendGroupMsgAction"<<currSendMsg<<isok<<replystr<<endl;
         httpAction=HttpAction::NoAction;
         break;
     case HttpAction::LoginOutAction:
@@ -385,7 +385,7 @@ void WebQQNet::httpFinished(QNetworkReply* reply){
 
             emit sysMsg("账号已经注销登录。");
         }
-        qDebug()<<"LoginOutAction"<<reply->error()<<replystr<<endl;
+        //qDebug()<<"LoginOutAction"<<reply->error()<<replystr<<endl;
         httpAction=HttpAction::NoAction;
         break;
     default:
@@ -425,7 +425,7 @@ void WebQQNet::getVerifyImg(QString qqnum){
     http->get(request);
 }
 void WebQQNet::login(QString qqnum,QString qqpass, QString verifyCode){
-    qDebug()<<getP(qqpass,verifyCode,uinhexstr);
+    //qDebug()<<getP(qqpass,verifyCode,uinhexstr);
     QNetworkRequest request;
     QString urlstr=QString("http://ptlogin2.qq.com/login?u=%1&p=%2&verifycode=%3&webqq_type=10&remember_uin=1&login2qq=1&aid=1003903&u1=%4&h=1&ptredirect=0&ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&action=2-11-12939&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10041&login_sig=Ip4V0YQezz6DEwpsE*-Cq*4NWVecBqWZYbNS22JCEQIT-sp20PyQtj8f-pqSIREa").arg(qqnum).arg(getP(qqpass,verifyCode,uinhexstr)).arg(verifyCode).arg("http%3A%2F%2Fweb2.qq.com%2Floginproxy.html%3Flogin2qq%3D1%26webqq_type%3D10");
     request.setUrl(QUrl(urlstr));
@@ -478,7 +478,7 @@ void WebQQNet::login2(){
     postData.append(QString("&clientid=%1&psessionid=null").arg(clientid));
     request.setHeader(QNetworkRequest::ContentLengthHeader,postData.size());
     httpAction=HttpAction::Login2Action;
-    qDebug()<<postData<<endl;
+    //qDebug()<<postData<<endl;
     http->post(request,postData);
 }
 void WebQQNet::loginout(){
@@ -537,7 +537,7 @@ void WebQQNet::getUserFriends(){
     postData.append("r="+QUrl::toPercentEncoding(QString("{\"h\":\"hello\",\"hash\":\"%1\",\"vfwebqq\":\"%2\"}").arg(getHash(uin,ptwebqq)).arg(vfwebqq)));
     request.setHeader(QNetworkRequest::ContentLengthHeader,postData.size());
     httpAction=HttpAction::GetUserFriendsAction;
-    qDebug()<<postData<<endl;
+    //qDebug()<<postData<<endl;
     http->post(request,postData);
 }
 void WebQQNet::getGroupNameList(){
@@ -559,7 +559,7 @@ void WebQQNet::getGroupNameList(){
     postData.append("r="+QUrl::toPercentEncoding(QString("{\"vfwebqq\":\"%1\"}").arg(vfwebqq)));
     request.setHeader(QNetworkRequest::ContentLengthHeader,postData.size());
     httpAction=HttpAction::GetGroupNameListAction;
-    qDebug()<<postData<<endl;
+    //qDebug()<<postData<<endl;
     http->post(request,postData);
 }
 
@@ -569,14 +569,14 @@ void WebQQNet::sendMsg(QString txuin, QString msg){
         currSendMsg.first=txuin;
         currSendMsg.second=msg;
         //对json 特殊字符进行替换
-        qDebug()<<"对json 特殊字符进行替换__前"<<msg<<endl;
+        //qDebug()<<"对json 特殊字符进行替换__前"<<msg<<endl;
         msg.replace("\\", "\\\\")
                 //.replace("\'", "")
                 .replace("\t", " ")
                 .replace("\r", " ")
                 .replace("\n", "\\\\n")
                 .replace("\"", "'");
-        qDebug()<<"对json 特殊字符进行替换__后"<<msg<<endl;
+        //qDebug()<<"对json 特殊字符进行替换__后"<<msg<<endl;
         if(txuinflag=="FTX"){
             WebQQ::webQQNet->sendBuddyMsg(txuin.mid(3),msg);
         }else if(txuinflag=="GTX"){
@@ -616,12 +616,12 @@ void WebQQNet::sendBuddyMsg(QString uin, QString msg){
     request.setRawHeader("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36");
     QByteArray postData;
     QString tmpdata=QString("{\"to\":%1,\"face\":492,\"content\":\"[\\\"%2\\\",\\\"\\\",[\\\"font\\\",{\\\"name\\\":\\\"宋体\\\",\\\"size\\\":\\\"9\\\",\\\"style\\\":[0,0,0],\\\"color\\\":\\\"FF0000\\\"}]]\",\"msg_id\":%3,\"clientid\":\"%4\",\"psessionid\":\"%5\"}").arg(uin).arg(msg).arg(msgId++).arg(clientid).arg(psessionid);
-    qDebug()<<tmpdata<<endl;
+    //qDebug()<<tmpdata<<endl;
     postData.append("r="+QUrl::toPercentEncoding(tmpdata));
     postData.append(QString("&clientid=%1&psessionid=%2").arg(clientid).arg(psessionid));
     request.setHeader(QNetworkRequest::ContentLengthHeader,postData.size());
     httpAction=HttpAction::SendBuddyMsgAction;
-    qDebug()<<"sendBuddyMsg"<<msg<<endl;
+    //qDebug()<<"sendBuddyMsg"<<msg<<endl;
     http->post(request,postData);
 
 }
@@ -640,19 +640,19 @@ void WebQQNet::sendGroupMsg(QString groupuin, QString msg){
     request.setRawHeader("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36");
     QByteArray postData;
     QString tmpdata=QString("{\"group_uin\":%1,\"content\":\"[\\\"%2\\\",\\\"\\\",[\\\"font\\\",{\\\"name\\\":\\\"宋体\\\",\\\"size\\\":\\\"9\\\",\\\"style\\\":[0,0,0],\\\"color\\\":\\\"FF0000\\\"}]]\",\"msg_id\":%3,\"clientid\":\"%4\",\"psessionid\":\"%5\"}").arg(groupuin).arg(msg).arg(msgId++).arg(clientid).arg(psessionid);
-    qDebug()<<tmpdata<<endl;
+    //qDebug()<<tmpdata<<endl;
     postData.append("r="+QUrl::toPercentEncoding(tmpdata));
     postData.append(QString("&clientid=%1&psessionid=%2").arg(clientid).arg(psessionid));
     request.setHeader(QNetworkRequest::ContentLengthHeader,postData.size());
     httpAction=HttpAction::SendGroupMsgAction;
-    qDebug()<<"sendGroupMsg"<<msg<<endl;
+    //qDebug()<<"sendGroupMsg"<<msg<<endl;
     http->post(request,postData);
 }
 
 QString WebQQNet::getP(QString qqpass, QString verifyCode, QString uinhexstr){
     QByteArray qqpassbyte=QCryptographicHash::hash(qqpass.toLatin1(),QCryptographicHash::Md5);
     QByteArray uinhexbyte = QByteArray::fromHex(uinhexstr.toLatin1());
-    qDebug()<<"uinhexbyte="<<uinhexbyte<<"uinstr="<<uinhexstr<<endl;
+    //qDebug()<<"uinhexbyte="<<uinhexbyte<<"uinstr="<<uinhexstr<<endl;
     QByteArray qqpassuinbyte=QCryptographicHash::hash(qqpassbyte+uinhexbyte,QCryptographicHash::Md5).toHex().toUpper();
     QByteArray byteP=QCryptographicHash::hash(qqpassuinbyte+verifyCode.toUpper().toLatin1(),QCryptographicHash::Md5).toHex().toUpper();
     return QString::fromLatin1(byteP);
