@@ -15,12 +15,13 @@ BaiduWeather::BaiduWeather(const QString &location, QObject *parent):
 void BaiduWeather::setLocation(const QString &location)
 {
     data = "对不起，我获取信息失败了、、、";
-//    location=location.trimmed();
+    //    location=location.trimmed();
     cityname=location;
-    QString strSent = "http://api.map.baidu.com/telematics/v3/weather?location=" + location +" &output=json&ak=6632266da0d7c5839bf5dcc440d15c87";
+    QString strSent = "http://api.map.baidu.com/telematics/v3/weather?location=" +location+"&output=json&ak=6632266da0d7c5839bf5dcc440d15c87";
+    //qDebug()<<strSent<<endl;
     request.setUrl(strSent);
     this->reply = this->manger.get(this->request);
-//    connect(reply,&QNetworkReply::finished,this,&BaiduWeather::analysisJson,Qt::DirectConnection);
+    //    connect(reply,&QNetworkReply::finished,this,&BaiduWeather::analysisJson,Qt::DirectConnection);
     QEventLoop evenloop;
     connect(&this->manger, SIGNAL(finished(QNetworkReply*)), &evenloop, SLOT(quit()));
     evenloop.exec();
@@ -29,25 +30,20 @@ void BaiduWeather::setLocation(const QString &location)
 
 void BaiduWeather::analysisJson()//解析json
 {
-
     QJsonObject jsonObj;
     QJsonArray jsonArray;
     jsonDocument = QJsonDocument::fromJson(QString(this->reply->readAll()).toUtf8());
-
-    if (!(jsonDocument.isNull() || jsonDocument.isEmpty()))
-    {
-        if (jsonDocument.isObject())
-        {
+    //qDebug()<<jsonDocument<<endl;
+    if (!(jsonDocument.isNull() || jsonDocument.isEmpty())){
+        if (jsonDocument.isObject()){
             jsonObj = jsonDocument.object();
-            if(jsonObj.value("status").toString() == "success")
-            {
+            if(jsonObj.value("status").toString() == "success") {
                 jsonArray = jsonObj.value("results").toArray();
                 jsonObj = jsonArray.at(0).toObject();
                 this->data = jsonObj.value("currentCity").toString()+"天气预报：";
                 this->data += "\n";
                 jsonArray = jsonObj.value("weather_data").toArray();
-                for (int i = 0; i< jsonArray.size();++i)
-                {
+                for (int i = 0; i< jsonArray.size();++i) {
                     jsonObj = jsonArray.at(i).toObject();
                     this->data += jsonObj.value("date").toString();
                     this->data += " ";
@@ -59,18 +55,14 @@ void BaiduWeather::analysisJson()//解析json
                     this->data += "\n";
                 }
             }
-            else
-            {
-              this->data = "对不起，找不到您输入的城市:"+cityname;
+            else{
+                this->data = "对不起!找不到您输入的城市:"+cityname;
             }
         }
-
     }
-    else
-    {
+    else{
         this->data = "对不起，找不到您输入的城市:"+cityname;
     }
-
     this->reply->deleteLater();
     emit sentWeather(data);
 }

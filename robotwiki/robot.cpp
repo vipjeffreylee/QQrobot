@@ -53,7 +53,6 @@ ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){
         }else{
             replyMsg.content=Baidutranslate::translate(tmpstr);
         }
-
     }
     return replyMsg;
 }

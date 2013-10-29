@@ -35,7 +35,7 @@ private:
     QMap<QString,QStringList> chat;
     void loadchat();
     void savechat(QString question,QString answer,QString creator);
-    void deletechat(QString id);
+    bool deletechat(QString id);
 
 };
 

@@ -61,23 +61,33 @@ void Robot::savechat(QString question, QString answer, QString creator){
         answerList<<answer+"#C#"+creator;
         chat.insert(question,answerList);
         id=answerList.takeFirst();
-        query.exec(QString("UPDATE chat SET answer='%1' where id=%2").arg(answerList.join("#A#")).arg(id));
+        query.exec(QString("UPDATE chat SET answer='%1' where id=%2").arg(answerList.join("#A#").replace("'","''")).arg(id));
     }else{
         answerList<<answer+"#C#"+creator;
-        if(query.exec(QString("INSERT INTO chat (question,answer) values ('%1','%2')").arg(question).arg(answer+"#C#"+creator))){
+        QString sqlstr=QString("INSERT INTO chat (question,answer) values ('%1','%2')").arg(question.replace("'","''")).arg(answer.replace("'","''")+"#C#"+creator.replace("'","''"));
+        if(query.exec(sqlstr)){
             id=query.lastInsertId().toString();
             answerList.push_front(id);
             chat.insert(question,answerList);
         }else{
-            qDebug()<<query.lastError()<<endl;
+            qDebug()<<query.lastError()<<endl<<sqlstr<<endl;
         }
     }
 }
-void Robot::deletechat(QString id){
+bool Robot::deletechat(QString id){
     QSqlQuery query;
-    if(!query.exec(QString("DELETE FROM chat where id=").arg(id))){
-        qDebug()<<query.lastError()<<endl;
+    if(query.exec("SELECT * FROM chat WHERE id="+id)){
+        if(query.next()){
+            QString question=query.value("question").toString();
+            if(query.exec(QString("DELETE FROM chat where id=%1").arg(id))){
+                chat.remove(question);
+                qDebug()<<question.length()<<question<<question.trimmed().length()<<question.trimmed()<<endl;
+                return true;
+            }
+        }
     }
+    qDebug()<<query.lastError()<<endl;
+    return false;
 }
 
 bool Robot::loaddb(){
@@ -114,6 +124,8 @@ void Robot::closedb(){
 }
 bool Robot::savejoke(QString joke,QString creator){
     QSqlQuery query;
+    joke=joke.replace("'","''");
+    creator=creator.replace("'","''");
     return query.exec(QString("INSERT INTO joke (content,creator) values('%1','%2');").arg(joke).arg(creator));
 }
 
@@ -145,32 +157,47 @@ ReplyMsg Robot::listenandsay(const MsgSender msgSender, const QString &message){
     }else if(message.left(2)=="#问"){
         int pos=message.indexOf("#答");
         if(pos>0){
-            QString question=message.mid(2,pos-2).trimmed();
-            QString answer=message.mid(pos+2);
+            QString question=message.mid(2,pos-2).trimmed().replace('?',"").replace("？","");
+            QString answer=message.mid(pos+2).trimmed();
             savechat(question,answer,msgSender.friendName);
-            replyMsg.content=QString("谢谢，我明白了，问我:%1,我回答:%2,现有知识库%3条。").arg(question).arg(answer).arg(chat.size());
+            replyMsg.content=QString("谢谢！有人说:%1,我则回应:%2。现有知识库条目%3。").arg(question).arg(answer).arg(chat.size());
         }else{
             replyMsg.content="有问没答。";
         }
     }else if(message.left(2)=="#查"){
-        QString question=message.mid(2).trimmed();
+        QString question=message.mid(2).trimmed().replace('?',"").replace("？","");
         QStringList answerList=chat.value(question);
         if(answerList.size()>0){
             QString id=answerList.takeFirst();
-            replyMsg.content=QString("id=%1 问:%2 答:%3").arg(id).arg(question).arg(answerList.join(';'));
+            replyMsg.content=QString("id=%1 问:%2\n答:%3").arg(id).arg(question).arg(answerList.join('\n').replace("#C#","    creator:"));
         }else{
             replyMsg.content=QString("没有查询到：%1").arg(question);
         }
 
     }else if(message.left(2)=="#删"){
+        QString id=message.mid(2).trimmed();
+        if(id.isEmpty()){
+            replyMsg.content="请输入要删除条目的id。";
+        }else{
+            if(msgSender.friendName.indexOf("瑞波")>-1){
+                if(deletechat(id)){
+                    replyMsg.content=QString("删除条目成功，现有知识库条目%1").arg(chat.size());
+                }else{
+                    replyMsg.content="删除失败，该条目不存在！id="+id;
+                }
+            }else{
+                replyMsg.content="对不起，你无权删除！";
+            }
+        }
 
     }else{
-        QStringList answerList=chat.value(message);
+        QString question=message.trimmed().replace('?',"").replace("？","");
+        QStringList answerList=chat.value(question);
         if(answerList.size()>1){
             answerList.removeFirst();
             QString answerstr=answerList.at(qrand()%(answerList.size()));
             int pos=answerstr.indexOf("#C#");
-            replyMsg.content=answerstr.left(pos);
+            replyMsg.content=answerstr.left(pos).replace("%name",msgSender.friendName);
         }
     }
     return replyMsg;
