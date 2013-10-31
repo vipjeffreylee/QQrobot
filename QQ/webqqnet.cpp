@@ -43,7 +43,7 @@ void WebQQNet::pollMsg(){
     QNetworkRequest request;
     request.setUrl(QUrl("http://d.web2.qq.com/channel/poll2"));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");//服务器偶尔使用gzip，Qt5依然不支持
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
@@ -64,8 +64,10 @@ void WebQQNet::pollMsg(){
 void WebQQNet::httpPollFinished(QNetworkReply* reply){
 
     QByteArray replyData=reply->readAll();
+    //qDebug()<<"httpPollFinished new"<<replyData.size()<<replyData<<endl;
     reply->deleteLater();
     QString replystr=QString::fromUtf8(replyData);
+   // qDebug()<<"httpPollFinished new2"<<replystr.length()<<replystr.toUtf8()<<endl;
     QJsonDocument jsonDoc;
     QJsonObject jsonObj;
     QJsonArray jsonArray;
@@ -137,7 +139,7 @@ void WebQQNet::getGroupMemberInfo(QString groupTXUIN){
     QString urlstr=QString("http://s.web2.qq.com/api/get_group_info_ext2?gcode=%1&cb=undefined&vfwebqq=%2&t=%3").arg(groupCode).arg(vfwebqq).arg(QDateTime::currentMSecsSinceEpoch());
     request.setUrl(QUrl(urlstr));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
@@ -401,7 +403,7 @@ void WebQQNet::checkVerifyCode(QString qqnum){
     request.setUrl(QUrl(QString("http://check.ptlogin2.qq.com/check?uin=%1&appid=1003903&js_ver=10041").arg(qqnum)));
     request.setRawHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8");
     request.setRawHeader("Cache-Control","max-age=0");
     request.setRawHeader("Connection","keep-alive");
@@ -415,7 +417,7 @@ void WebQQNet::getVerifyImg(QString qqnum){
     request.setUrl(QUrl(QString("http://captcha.qq.com/getimage?aid=1003903&uin=%1").arg(qqnum)));
     request.setRawHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     //request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8");
     request.setRawHeader("Cache-Control","max-age=0");
     request.setRawHeader("Connection","keep-alive");
@@ -432,7 +434,7 @@ void WebQQNet::login(QString qqnum,QString qqpass, QString verifyCode){
     // qDebug()<<urlstr<<endl;
     request.setRawHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8");
     request.setRawHeader("Cache-Control","max-age=0");
     request.setRawHeader("Connection","keep-alive");
@@ -450,7 +452,7 @@ void WebQQNet::check_sig(QString urlstr){
     // qDebug()<<urlstr<<endl;
     request.setRawHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+   //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8");
     request.setRawHeader("Cache-Control","max-age=0");
     request.setRawHeader("Connection","keep-alive");
@@ -464,7 +466,7 @@ void WebQQNet::login2(){
     QNetworkRequest request;
     request.setUrl(QUrl("http://d.web2.qq.com/channel/login2"));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
@@ -490,7 +492,7 @@ void WebQQNet::loginout(){
     // qDebug()<<urlstr<<endl;
     request.setRawHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8");
     request.setRawHeader("Cache-Control","max-age=0");
     request.setRawHeader("Connection","keep-alive");
@@ -508,7 +510,7 @@ void WebQQNet::getFriendInfo(QString qqnum){
     // qDebug()<<urlstr<<endl;
     request.setRawHeader("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+   //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8");
     request.setRawHeader("Cache-Control","max-age=0");
     request.setRawHeader("Connection","keep-alive");
@@ -524,7 +526,7 @@ void WebQQNet::getUserFriends(){
     QNetworkRequest request;
     request.setUrl(QUrl("http://s.web2.qq.com/api/get_user_friends2"));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
@@ -546,7 +548,7 @@ void WebQQNet::getGroupNameList(){
     QNetworkRequest request;
     request.setUrl(QUrl("http://s.web2.qq.com/api/get_group_name_list_mask2"));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
@@ -605,7 +607,7 @@ void WebQQNet::sendBuddyMsg(QString uin, QString msg){
     QNetworkRequest request;
     request.setUrl(QUrl("http://d.web2.qq.com/channel/send_buddy_msg2"));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
@@ -629,7 +631,7 @@ void WebQQNet::sendGroupMsg(QString groupuin, QString msg){
     QNetworkRequest request;
     request.setUrl(QUrl("http://d.web2.qq.com/channel/send_qun_msg2"));
     request.setRawHeader("Accept","*/*");
-    request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
+    //request.setRawHeader("Accept-Encoding","gzip,deflate,sdch");
     request.setRawHeader("Accept-Language","zh-CN,zh;q=0.8,en-US;q=0.6,en;q=0.4");
     request.setRawHeader("Accept-Charset","GBK,utf-8;q=0.7,*;q=0.3");
     request.setRawHeader("Connection","keep-alive");
